@@ -2,14 +2,12 @@ import { isNil } from '@activepieces/core-utils';
 import {
   PlanName,
   UpgradeLocationInWebApp,
-  TelemetryEventName,
   SalesLinkLocationInWebApp,
 } from '@activepieces/shared';
 import { t } from 'i18next';
 import { UserRound, Check, Gem } from 'lucide-react';
 import { ReactNode } from 'react';
 
-import { useTelemetry } from '@/components/providers/telemetry-provider';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -50,20 +48,7 @@ export function SelfServeTrialLockedActions({
   const actionWhenLocked = useActionWhenLocked();
   const plan = usePlanThatHasFeature(featureKey);
   const { openDialog } = billingDialogHooks.useSelfServeTrialDialogStore();
-  const { capture } = useTelemetry();
   const upgradeClick = useUpgradeClick();
-  const contactSales = () => {
-    onAction?.();
-    if (
-      featureKey !== undefined &&
-      locationInWebApp !== UpgradeLocationInWebApp.DIALOG
-    ) {
-      capture({
-        name: TelemetryEventName.PLATFORM_ADMIN_SALES_CONTACTED,
-        payload: { feature: featureKey, surface: locationInWebApp },
-      });
-    }
-  };
   const explorePlans = (variant: 'default' | 'outline' | 'link') => (
     <Button
       {...adminControl(AdminControl.TRIAL_PLANS_OPEN)}
@@ -90,7 +75,7 @@ export function SelfServeTrialLockedActions({
       size={buttonSize}
       className={variant === 'link' ? 'h-auto p-0' : undefined}
       featureKey={featureKey}
-      onClick={contactSales}
+      onClick={onAction}
     />
   );
 

@@ -4,8 +4,9 @@
 /* eslint-disable jest-dom/prefer-in-document, jest-dom/prefer-to-have-attribute -- @testing-library/jest-dom is not a dependency of packages/web */
 import {
   ApEdition,
+  PlanName,
   PlatformAdminLimit,
-  UpgradeLocationInWebApp,
+  SalesLinkLocationInWebApp,
   TelemetryEventName,
 } from '@activepieces/shared';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -128,9 +129,14 @@ describe('platform admin telemetry', () => {
       </FeatureSample>,
     );
     fireEvent.click(screen.getByRole('link', { name: /talk to sales/i }));
-    expect(
-      capturedPayload(TelemetryEventName.PLATFORM_ADMIN_SALES_CONTACTED),
-    ).toEqual({ feature: 'AUDIT_LOGS', surface: UpgradeLocationInWebApp.SAMPLE });
+    expect(capturedNames()).not.toContain(
+      TelemetryEventName.PLATFORM_ADMIN_SALES_CONTACTED,
+    );
+    expect(capturedPayload(TelemetryEventName.SALES_HANDOFF_CLICKED)).toEqual({
+      plan: PlanName.ENTERPRISE,
+      surface: SalesLinkLocationInWebApp.LOCKED_FEATURE,
+      featureKey: 'AUDIT_LOGS',
+    });
   });
 
   it('reports the sales enquiry from a locked page', () => {
@@ -146,9 +152,14 @@ describe('platform admin telemetry', () => {
       </LockedFeatureGuard>,
     );
     fireEvent.click(screen.getByRole('link', { name: /talk to sales/i }));
-    expect(
-      capturedPayload(TelemetryEventName.PLATFORM_ADMIN_SALES_CONTACTED),
-    ).toEqual({ feature: 'API', surface: UpgradeLocationInWebApp.TEASER });
+    expect(capturedNames()).not.toContain(
+      TelemetryEventName.PLATFORM_ADMIN_SALES_CONTACTED,
+    );
+    expect(capturedPayload(TelemetryEventName.SALES_HANDOFF_CLICKED)).toEqual({
+      plan: PlanName.ENTERPRISE,
+      surface: SalesLinkLocationInWebApp.LOCKED_FEATURE,
+      featureKey: 'API',
+    });
   });
 
   it('reports a refused control and the limit behind it, with no control id on the locked trigger', () => {
